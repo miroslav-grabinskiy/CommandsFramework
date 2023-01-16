@@ -18,7 +18,7 @@ https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
 
 ---------------
 ---------------
-# Queues \
+# Queues
 `serviceQ` - для общения с Service \
 `innerQ` - для выполнения следуйщих stage при окончании stage без реквеста на service.
 
