@@ -1,4 +1,4 @@
-###Diagram: 
+# Diagram: 
 
 **OPEN IN** `draw.io` application!!!!!!!!!!!! (on site)
 
@@ -7,7 +7,7 @@ https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
 
 ---------------
 ---------------
-###Config
+# Config
 
 Комманды для Бизнес-кейса делим на stages, 
 каждый stage - это функция, которая может быть выполнена любым воркером в любое время,
@@ -18,7 +18,7 @@ https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
 
 ---------------
 ---------------
-###Queues \
+# Queues \
 `serviceQ` - для общения с Service \
 `innerQ` - для выполнения следуйщих stage при окончании stage без реквеста на service.
 
@@ -28,7 +28,7 @@ https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
 ----------------
 ---------------
 
-###Process
+# Process
 
 
 ### Store
