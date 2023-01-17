@@ -2,11 +2,18 @@
 
 # Diagram: 
 
-**OPEN IN** `draw.io` application!!!!!!!!!!!! (on site)
+**OPEN IN** `draw.io` application or on sine (app.diagrams.net) as uml diagram! Not as image!
 
+[comment]: <> ( this is old links with old diagram)
+
+[comment]: <> (https://drive.google.com/file/d/15XmuINoOT5RfVd5xvlK1EuHchphPYOdG/view?usp=sharing)
+[comment]: <> (https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG)
+
+https://viewer.diagrams.net/?tags=%7B%7D&highlight=0000ff&edit=_blank&layers=1&nav=1&title=%D0%94%D0%B8%D0%B0%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0%20%D0%B1%D0%B5%D0%B7%20%D0%BD%D0%B0%D0%B7%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.drawio#Uhttps%3A%2F%2Fdrive.google.com%2Fuc%3Fid%3D15XmuINoOT5RfVd5xvlK1EuHchphPYOdG%26export%3Ddownload
+
+OR: (but see only as diagram, because google drive caches images)
 https://drive.google.com/file/d/15XmuINoOT5RfVd5xvlK1EuHchphPYOdG/view?usp=sharing
 https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
-
 ---------------
 ---------------
 # Config
@@ -23,6 +30,8 @@ https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
 # Queues
 `serviceQ` - для общения с Service \
 `innerQ` - для выполнения следуйщих stage при окончании stage без реквеста на service.
+
+настроить неудаление обработанных месседжей некоторое(необходимое) время
 
 Предполагается использвоание `RabbitMQ` или альтернативы - у которой есть внутренние настройки перезапуска обработчика
 (если он не отвечает какое-то количество времени).
@@ -41,10 +50,17 @@ https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
 
 ###Stages
 
+при попадании message из innerQ или из serviceQ
+начинается выполнение следуйщего stage
+
+предидущий результат сохраняется в store (если не выставлен флаг не сохранять в конфиге)
+
 могут выполняться в разных процессах (workers, containers, etc)
 
 **UPDATE:** 
-TODO: При старте stage - проверять - есть ли уже сообщение с taskId стейджа в очередях (в innerQ и serviceQ) - если есть - заканчивать процесс и не переходить к выполнению stage
+При старте stage - проверяется - есть ли уже сообщение с taskId стейджа в очередях (в innerQ и serviceQ) -
+если есть - процесс заканчивается, message помечается как выполненный
+(это значит что этот stage уже был завершен ранее, но подтверждение в очередь этого не пришло)
 
 --------
 если stage заканчивается запросом на сервис -
@@ -146,7 +162,7 @@ markMessageAsResolved();
 ```
 
 **UPDATE:** Либо не удалять messages после их завершения и перед отправкой нового message - смотреть - было ли уже отправлено это собщение
-
+(реализовано)
 
 внутри моего сервиса я для каждой комманды отправленной на сервис создаю taskId
 который является засериализованной строкой в которой хранятся:
@@ -171,4 +187,6 @@ check some error handlers
 
 **UPDATE:**  не удалять messages после их завершения из rabbitMQ (можно настроить время хранения)
 
-При старте stage - проверять - есть ли уже сообщение с taskId стейджа в очередях (в innerQ и serviceQ) - если service удаляет месседжи после завершения - добавить ServiceApiGatewayQ который не будет пропускать повторые messages
+При старте stage - проверяется - есть ли уже сообщение с taskId стейджа в очередях (в innerQ и serviceQ) - 
+если service удаляет месседжи после завершения - добавить ServiceApiGatewayQ и запросы делать через него, 
+gateway не будет пропускать повторные messages

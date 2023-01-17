@@ -1,9 +1,10 @@
-import { EInnerMessageType, IInnerQMessage, innerQ, IInnerQMessageWrap } from "./MessageBus/innerQ";
+import { EInnerMessageType, innerQ, IInnerQMessageWrap } from "./MessageBus/innerQ";
 import { workerify } from "./libs/cluster";
 import * as Errors  from "./errors";
-import { isAllowedApiV } from "./dbs/apiVStore";
 import { getBusinessCase } from "./businessCases/controller";
 import { processStage } from "./businessCases/handler";
+import { createTaskId } from "./businessCases/lib";
+import { checkExistingMessageByTaskId } from "./MessageBus/lib";
 
 workerify(process.env.IS_MULTI_INNER_Q_CONSUMER === 'true', () => {
     innerQ.on(async (message: IInnerQMessageWrap) => {
@@ -27,7 +28,17 @@ workerify(process.env.IS_MULTI_INNER_Q_CONSUMER === 'true', () => {
                 throw '???'
             }
 
-            await processStage({businessCaseName, apiV, previousResult, stageIndex, processId});
+            const stage = api[stageIndex];
+            const currentStageTaskId = createTaskId({ businessCaseName, apiV, processId, stageName: stage.name });
+
+            const currentStageFinished = await checkExistingMessageByTaskId(currentStageTaskId);
+
+            if (currentStageFinished) {
+                message.markAsResolved();
+                return;
+            }
+
+            await processStage({businessCaseName, apiV, previousResult, stageIndex, processId, taskId: currentStageTaskId});
             await message.markAsResolved();
         } catch(err) {
             await message.markAsResolved();

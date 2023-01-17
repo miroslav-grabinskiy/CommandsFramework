@@ -2,9 +2,8 @@ import {
     ECommandName,
     IServiceMessageRequest,
     serviceQ,
-    TaskId
 } from "../MessageBus/serviceQ";
-import { signature } from "../../src/concreteLogicService.types";
+import { TaskId } from "../MessageBus/lib";
 
 export async function checkApproved(taskId: TaskId, DONT_UNDERSTANDABLE_VARIABLE_FROM_TASK: string): Promise<void> {
     const message: IServiceMessageRequest<string> = {
@@ -72,7 +71,7 @@ export async function send(taskId, DONT_UNDERSTANDABLE_VARIABLE_FROM_TASK: strin
 export interface ISendPayload {
     DONT_UNDERSTANDABLE_VARIABLE_FROM_TASK: string;
     address: IServiceAddress;
-    signature: signature;
+    signature: ISignature;
 }
 
 export type ISignature = string;

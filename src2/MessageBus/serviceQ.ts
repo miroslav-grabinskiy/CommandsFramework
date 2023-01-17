@@ -1,20 +1,15 @@
 //THIS IS MOCK
 //TODO: Connect rabbitMQ to service
+import { TaskId } from "./lib";
+
 export const serviceQ = {
     send<Payload>
     (message: IServiceMessageRequest<Payload>) {},
-
-
     on(task: (message: IServiceQMessageResponseWrap) => Promise<any>) {},
-}
-
-export type TaskId = string;
-
-export interface ITaskId {
-    processId: string;
-    businessCaseName: string;
-    apiV: string;
-    stageName: string;
+    findMessageById(taskId): Promise<boolean> {
+        //fixme: find message in Q
+        return Promise.resolve(false);
+    },
 }
 
 export interface IServiceMessageRequest<Payload> {

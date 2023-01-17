@@ -6,6 +6,7 @@ import { isAllowedApiV } from "../dbs/apiVStore";
 import { INextParams } from "./businessCases.types";
 import { IStoreDb } from "../dbs/stateStore";
 import { createTaskId } from "./lib";
+import { TaskId } from "../MessageBus/lib";
 
 const defaultHiddenPayload = '***'; //TODO: get from config
 
@@ -32,9 +33,11 @@ export async function startProcess(businessCaseName: string, businessCasePayload
         const payload = isSavePayload ? businessCasePayload : defaultHiddenPayload;
 
         const processId = await stateDb.createProcess(businessCaseName, businessCasePayload, apiV, api.payloadName) as string;
+        const taskId = createTaskId({processId, businessCaseName, apiV, stageName: api.stages[0].name})
 
         //TODO: add case when payload should be hidden: immediately run stage 1 (resolve transaction lock)
         await innerQ.send({
+            taskId,
             type: EInnerMessageType.startStage,
             data: {
                 processId,
@@ -77,7 +80,7 @@ export async function getResult(processId: string): Promise<IProcessResult> {
     };
 }
 
-export async function processStage({ businessCaseName, apiV, previousResult, stageIndex, processId }: IProcessStageParams) {
+export async function processStage({ businessCaseName, apiV, previousResult, stageIndex, processId, taskId }: IProcessStageParams) {
     const businessCase = getBusinessCase(businessCaseName);
     const api = businessCase.apis[apiV];
 
@@ -100,8 +103,6 @@ export async function processStage({ businessCaseName, apiV, previousResult, sta
     }
 
     try {
-        const taskId = createTaskId({ businessCaseName, apiV, processId, stageName: stage.name });
-
         await stage.handler({
             processId,
             taskId,
@@ -120,6 +121,7 @@ export async function processStage({ businessCaseName, apiV, previousResult, sta
     async function nextStage(params: INextParams) {
         //TODO: add process params.opts.runSync
         await innerQ.send({
+            taskId,
             type: EInnerMessageType.startStage,
             data: {
                 processId,
@@ -133,6 +135,7 @@ export async function processStage({ businessCaseName, apiV, previousResult, sta
 }
 
 export interface IProcessStageParams {
+    taskId: TaskId;
     businessCaseName: string;
     apiV: string;
     stageIndex: number;
