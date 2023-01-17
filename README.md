@@ -1,4 +1,4 @@
-UPDATE!:
+**UPDATE!:** 
 
 # Diagram: 
 
@@ -43,6 +43,7 @@ https://app.diagrams.net/#G15XmuINoOT5RfVd5xvlK1EuHchphPYOdG
 
 могут выполняться в разных процессах (workers, containers, etc)
 
+**UPDATE:** 
 TODO: При старте stage - проверять - есть ли уже сообщение с taskId стейджа в очередях (в innerQ и serviceQ) - если есть - заканчивать процесс и не переходить к выполнению stage
 
 --------
@@ -144,7 +145,7 @@ await transaction((message) => {
 markMessageAsResolved();
 ```
 
-*UPDATE:* Либо не удалять messages после их завершения и перед отправкой нового message - смотреть - было ли уже отправлено это собщение
+**UPDATE:** Либо не удалять messages после их завершения и перед отправкой нового message - смотреть - было ли уже отправлено это собщение
 
 
 внутри моего сервиса я для каждой комманды отправленной на сервис создаю taskId
@@ -168,6 +169,6 @@ markMessageAsResolved();
 
 check some error handlers
 
-*UPDATE:* не удалять messages после их завершения из rabbitMQ (можно настроить время хранения)
+**UPDATE:**  не удалять messages после их завершения из rabbitMQ (можно настроить время хранения)
 
 При старте stage - проверять - есть ли уже сообщение с taskId стейджа в очередях (в innerQ и serviceQ) - если service удаляет месседжи после завершения - добавить ServiceApiGatewayQ который не будет пропускать повторые messages
